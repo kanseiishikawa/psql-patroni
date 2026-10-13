@@ -1,0 +1,121 @@
+services:
+  etcd1:
+    image: quay.io/coreos/etcd:v3.5.11
+    container_name: etcd1
+    volumes:
+      - ./config/etcd/etcd1.yml:/opt/etcd/etcd.yml
+    command: etcd --config-file=/opt/etcd/etcd.yml
+    networks:
+      patroni-net:
+        ipv4_address: 172.20.0.21
+        aliases:
+          - etcd1
+
+  etcd2:
+    image: quay.io/coreos/etcd:v3.5.11
+    container_name: etcd2
+    volumes:
+      - ./config/etcd/etcd2.yml:/opt/etcd/etcd.yml
+    command: etcd --config-file=/opt/etcd/etcd.yml
+    networks:
+      patroni-net:
+        ipv4_address: 172.20.0.22
+        aliases:
+          - etcd1
+
+  etcd3:
+    image: quay.io/coreos/etcd:v3.5.11
+    container_name: etcd3
+    volumes:
+      - ./config/etcd/etcd3.yml:/opt/etcd/etcd.yml
+    command: etcd --config-file=/opt/etcd/etcd.yml
+    networks:
+      patroni-net:
+        ipv4_address: 172.20.0.23
+        aliases:
+          - etcd1
+
+  pg-node-1:
+    image: test-psql:latest
+    container_name: pg-node-1
+    user: postgres
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    volumes:
+      - ./config/patroni/patroni-1.yaml:/etc/patroni/patroni.yml
+    command: ["patroni", "/etc/patroni/patroni.yml"]
+    networks:
+      patroni-net:
+        ipv4_address: 172.20.0.11
+        aliases:
+          - postgres-1
+    restart: always
+    
+  pg-node-2:
+    image: test-psql:latest
+    container_name: pg-node-2
+    user: postgres
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    volumes:
+      - ./config/patroni/patroni-2.yaml:/etc/patroni/patroni.yml
+    command: ["patroni", "/etc/patroni/patroni.yml"]
+    networks:
+      patroni-net:
+        ipv4_address: 172.20.0.12
+        aliases:
+          - postgres-2
+    restart: always
+
+  pg-node-3:
+    image: test-psql:latest
+    container_name: pg-node-3
+    user: postgres
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    volumes:
+      - ./config/patroni/patroni-3.yaml:/etc/patroni/patroni.yml
+    command: ["patroni", "/etc/patroni/patroni.yml"]
+    networks:
+      patroni-net:
+        ipv4_address: 172.20.0.13
+        aliases:
+          - postgres-3
+    restart: always
+
+  haproxy:
+    image: haproxy:2.8-alpine
+    container_name: haproxy-1
+    volumes:
+      - ./config/haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    depends_on:
+      - pg-node-1
+      - pg-node-2
+      - pg-node-3
+    networks:
+      patroni-net:
+        ipv4_address: 172.20.0.10
+    restart: always
+
+  app-client:
+    image: postgres:18-alpine
+    container_name: app-client
+    user: root
+    entrypoint: [ "sh", "-c", "while true; do sleep 3600; done" ]
+    networks:
+      patroni-net:
+        ipv4_address: 172.20.0.30 
+    restart: always
+
+networks:
+  patroni-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

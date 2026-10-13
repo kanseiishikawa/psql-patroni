@@ -1,0 +1,61 @@
+# クラスター全体で共通の識別子
+scope: pg-cluster
+
+# このノード固有の名前（例: pg-node-1, pg-node-2, pg-node-3）
+name: pg-node-3
+
+# DCS（分散構成ストア）としてetcd3を指定
+etcd3:
+  # Docker Composeを使う場合、コンテナ名やサービス名で指定可能
+  hosts:
+    - 172.20.0.21:2379
+    - 172.20.0.22:2379
+    - 172.20.0.23:2379
+  use_proxies: true
+  loop_wait: 10
+  retry_timeout: 10
+
+# 他のノードやクライアントがこのPatroniにアクセスするためのAPI設定
+restapi:
+  listen: 0.0.0.0:8008
+  connect_address: 172.20.0.13:8008 # 自身のコンテナ名やIPを指定
+
+# クラスターの初期化設定（最初の起動時にetcdへ登録される）
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+    maximum_lag_on_failover: 1048576
+    postgresql:
+      use_pg_rewind: true
+      use_slots: true
+      parameters:
+        shared_buffers: 128MB
+        wal_level: replica
+        max_wal_senders: 10
+        max_replication_slots: 10
+        hot_standby: "on"
+
+  # PostgreSQLの初期ユーザー・レプリケーション設定
+  initdb:
+    - encoding: UTF8
+    - data-checksums
+
+  pg_hba:
+    - host replication replicator 0.0.0.0/0 md5
+    - host all all 0.0.0.0/0 md5
+
+# PostgreSQL固有の起動・接続設定
+postgresql:
+  listen: 0.0.0.0:5432
+  connect_address: 172.20.0.13:5432 # 自身のコンテナ名やIPを指定
+  data_dir: /data/patroni # コンテナ内のデータ保存先
+  bin_dir: /usr/lib/postgresql/18/bin # OSやPGバージョンに合わせて変更
+  authentication:
+    replication:
+      username: replicator
+      password: replicator_password
+    superuser:
+      username: postgres
+      password: postgres_password
