@@ -1,0 +1,41 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam databaseBackgroundColor #LightCyan
+skinparam ArrowColor #DimGray
+
+title 3-Node etcd & 3-Node PostgreSQL HA Configuration with HAProxy
+
+' 1. アプリケーション層
+cloud "Application" as app
+
+' 2. ロードバランサー層 (追加)
+node "HAProxy" as haproxy #LightYellow
+
+' 3. PostgreSQL サーバー（3台）
+package "PostgreSQL" {
+    database "PostgreSQL-01\n(Primary)" as pg1 #LightGreen
+    database "PostgreSQL-02\n(Replica)" as pg2
+    database "PostgreSQL-03\n(Replica)" as pg3
+    
+    ' プライマリからレプリカへのデータ複製
+    pg1 --> pg2 : Replication
+    pg1 --> pg3 : Replication
+}
+
+' 4. etcd サーバー（3台）
+package "etcd" {
+    database "etcd-01" as etcd1
+    database "etcd-02" as etcd2
+    database "etcd-03" as etcd3
+}
+
+' 5. アクセス経路 (HAProxyを経由するように修正)
+app --> haproxy : DB Connection
+haproxy --> pg1 : Route to Primary
+
+' 6. PostgreSQLとetcdの関係性（HA管理・死活監視）
+pg1 ..> etcd1 : HA Management / Lock
+pg2 ..> etcd2 : Health Check
+pg3 ..> etcd3 : Health Check
+
+@enduml
