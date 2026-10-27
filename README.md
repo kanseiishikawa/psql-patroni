@@ -39,7 +39,7 @@ docker exec -it pg-node-1 patronictl -c /etc/patroni/patroni.yml list
 
 データを挿入して確認
 ```
-docker exec -it app-client psql -h 172.20.0.100 -p 5432 -U postgres
+docker exec -it app-client psql -h 172.20.0.10 -p 5432 -U postgres
 CREATE TABLE test_table (id int, name text);
 INSERT INTO test_table VALUES (1, 'patroni-test');
 SELECT * FROM test_table;
