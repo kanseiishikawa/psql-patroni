@@ -89,10 +89,10 @@ services:
 
   old-pg-node-1:
     image: postgres:12
-    container_name: pg-node-3
+    container_name: old-pg-node-1
     user: postgres
     environment:
-      POSTGRES_USER: myuser
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: mydb
     networks:
