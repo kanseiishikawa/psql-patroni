@@ -85,8 +85,19 @@ services:
     networks:
       patroni-net:
         ipv4_address: 172.20.0.13
-        aliases:
-          - postgres-3
+    restart: always
+
+  old-pg-node-1:
+    image: postgres:12
+    container_name: pg-node-3
+    user: postgres
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    networks:
+      patroni-net:
+        ipv4_address: 172.20.0.14
     restart: always
 
   haproxy:
