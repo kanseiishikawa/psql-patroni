@@ -51,6 +51,20 @@ bootstrap:
     - host replication replicator 0.0.0.0/0 md5
     - host all all 0.0.0.0/0 md5
 
+  # 既存の非Patroniサーバーを同期元として指定
+    standby_cluster:
+      host: "172.20.0.14"
+      port: 5432
+      primary_slot_name: "migration_slot"  # 既存側で作ったスロット名
+    
+    # 既存のレプリケーション用ユーザー情報を指定
+    postgresql:
+      use_slots: true
+      authentication:
+        replication:
+          username: "replicator"
+          password: "replicator_password"
+
 # PostgreSQL固有の起動・接続設定
 postgresql:
   listen: 0.0.0.0:5432
