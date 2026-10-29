@@ -83,7 +83,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: mydb
-      POSTGRES_INITDB_ARGS: "--auth-replication=md5"
     volumes:
       - ./config/psql-init/:/docker-entrypoint-initdb.d
     networks:
