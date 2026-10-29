@@ -44,9 +44,9 @@ bootstrap:
 
     # 既存の非Patroniサーバーを同期元として指定
     standby_cluster:
-    host: "172.20.0.14"
-    port: 5432
-    primary_slot_name: "migration_slot"  # 既存側で作ったスロット名
+      host: "172.20.0.14"
+      port: 5432
+      primary_slot_name: "migration_slot"  # 既存側で作ったスロット名
     
     # 既存のレプリケーション用ユーザー情報を指定
     postgresql:
@@ -77,4 +77,4 @@ postgresql:
       password: replicator_password
     superuser:
       username: postgres
-      password: postgres_password
+      password: mypassword

@@ -58,4 +58,4 @@ postgresql:
       password: replicator_password
     superuser:
       username: postgres
-      password: postgres_password
+      password: mypassword
