@@ -32,7 +32,7 @@ bootstrap:
       use_slots: true
       parameters:
         shared_buffers: 128MB
-        wal_level: replica
+        wal_level: logical
         max_wal_senders: 10
         max_replication_slots: 10
         hot_standby: "on"
