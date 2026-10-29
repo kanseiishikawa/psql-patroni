@@ -95,6 +95,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: mydb
+    volumes:
+      - ./config/sql/:/docker-entrypoint-initdb.d
     networks:
       patroni-net:
         ipv4_address: 172.20.0.14
