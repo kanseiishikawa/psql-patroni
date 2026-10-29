@@ -39,10 +39,6 @@ services:
     image: test-psql:latest
     container_name: pg-node-1
     user: postgres
-    environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydb
     volumes:
       - ./config/patroni/patroni-1.yaml:/etc/patroni/patroni.yml
     command: ["patroni", "/etc/patroni/patroni.yml"]
@@ -57,10 +53,6 @@ services:
     image: test-psql:latest
     container_name: pg-node-2
     user: postgres
-    environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydb
     volumes:
       - ./config/patroni/patroni-2.yaml:/etc/patroni/patroni.yml
     command: ["patroni", "/etc/patroni/patroni.yml"]
@@ -75,10 +67,6 @@ services:
     image: test-psql:latest
     container_name: pg-node-3
     user: postgres
-    environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: mydb
     volumes:
       - ./config/patroni/patroni-3.yaml:/etc/patroni/patroni.yml
     command: ["patroni", "/etc/patroni/patroni.yml"]
@@ -95,6 +83,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: mydb
+      POSTGRES_INITDB_ARGS: "--auth-replication=md5"
     volumes:
       - ./config/sql/:/docker-entrypoint-initdb.d
     networks:
