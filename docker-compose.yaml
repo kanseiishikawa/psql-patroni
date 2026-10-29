@@ -84,7 +84,9 @@ services:
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: mydb
     volumes:
+      - ./config/psql/postgresql.conf:/tmp/postgresql.conf
       - ./config/psql-init/:/docker-entrypoint-initdb.d
+    command: ["postgres", "-c", "config_file=/tmp/postgresql.conf"]
     networks:
       patroni-net:
         ipv4_address: 172.20.0.14

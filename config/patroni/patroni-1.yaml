@@ -42,20 +42,6 @@ bootstrap:
         max_replication_slots: 10
         hot_standby: "on"
 
-    # 既存の非Patroniサーバーを同期元として指定
-    standby_cluster:
-      host: "172.20.0.14"
-      port: 5432
-      primary_slot_name: "migration_slot"  # 既存側で作ったスロット名
-    
-    # 既存のレプリケーション用ユーザー情報を指定
-    postgresql:
-      use_slots: true
-      authentication:
-        replication:
-          username: "replicator"
-          password: "replicator_password"
-
   # PostgreSQLの初期ユーザー・レプリケーション設定
   initdb:
     - encoding: UTF8
