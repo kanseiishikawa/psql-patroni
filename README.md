@@ -57,7 +57,7 @@ $ docker exec -it app-client psql "postgresql://postgres:mypassword@172.20.0.11:
 CREATE DATABASE mydb;
 
 $ docker exec -it app-client psql "postgresql://postgres:mypassword@172.20.0.14:5432/mydb"
-SELECT pg_create_physical_replication_slot('migration_slot');
+CREATE PUBLICATION migration_pub FOR ALL TABLES;
 SELECT pg_create_logical_replication_slot('migration_sub', 'pgoutput');
 
 app-clientで実行
@@ -82,7 +82,7 @@ $ docker-compose up -d pg-node-2 pg-node-3
 # docker stop old-pg-node-1
 
 # 残っているSUBSCRIPTIONを削除
-$ docker exec -it app-client psql "postgresql://postgres:mypassword@172.20.0.11:5432"
+$ docker exec -it app-client psql "postgresql://postgres:mypassword@172.20.0.11:5432/mydb"
 ALTER SUBSCRIPTION migration_sub DISABLE;
 ALTER SUBSCRIPTION migration_sub SET (slot_name = NONE);
 DROP SUBSCRIPTION migration_sub;
