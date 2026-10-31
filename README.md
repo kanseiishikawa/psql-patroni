@@ -70,8 +70,21 @@ CREATE SUBSCRIPTION migration_sub
 CONNECTION 'host=172.20.0.14 port=5432 user=postgres password=mypassword dbname=mydb'
 PUBLICATION migration_pub
 WITH (
-  copy_data = false,          -- 👈 データを全削除（TRUNCATE）させない
-  create_slot = false,        -- 👈 スロットはステップ1で手動作成済みのを使う
-  slot_name = 'migration_sub' -- 👈 ステップ1で作ったスロット名を指定
+  copy_data = false,
+  create_slot = false,
+  slot_name = 'migration_sub'
 );
+
+# 残りのpsqlを立ち上げる
+$ docker-compose up -d pg-node-2 pg-node-3
+
+# 古いnodeをstop
+# docker stop old-pg-node-1
+
+# 残っているSUBSCRIPTIONを削除
+$ docker exec -it app-client psql "postgresql://postgres:mypassword@172.20.0.11:5432"
+ALTER SUBSCRIPTION migration_sub DISABLE;
+ALTER SUBSCRIPTION migration_sub SET (slot_name = NONE);
+DROP SUBSCRIPTION migration_sub;
+SELECT subname, subenabled, subconninfo FROM pg_subscription; # 削除確認
 ```
